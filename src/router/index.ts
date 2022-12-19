@@ -3,6 +3,8 @@ import { createRouter, createWebHistory } from "vue-router";
 import HomePage from "@/shared/pages/HomePage.vue";
 import AboutPage from "@/shared/pages/AboutPage.vue";
 
+import { characterRoute } from '@/characters/router';
+
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
@@ -11,15 +13,14 @@ const router = createRouter({
         { path: "/about", name: "About", component: AboutPage },
 
         // Characters
-        {
-            path: "/characters",
-            name: "Characters",
-            component: () => "@/characters/layouts/CharactersLayout.vue",
-        },
+        characterRoute,
 
         // Default
         { path: "/:pathMatch(.*)*", redirect: () => ({ name: "Home" }) },
     ],
 });
+
+// path: "/characters",
+// router.addRoute(characterRoute)
 
 export default router;
