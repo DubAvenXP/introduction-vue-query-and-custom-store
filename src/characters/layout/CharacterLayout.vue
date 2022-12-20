@@ -4,8 +4,8 @@ import Navbar from "@/shared/components/Navbar.vue";
 import { characterRoute } from "../router";
 import type { RouterLink } from "@/router/link-routes";
 
-const routerLinks: RouterLink[] = characterRoute.children!
-    .filter((route) => (route.props as { visible: boolean }).visible)
+const routerLinks: RouterLink[] = characterRoute
+    .children!.filter((route) => (route.props as { visible: boolean }).visible)
     .map((route) => {
         return {
             name: route.name as string,
@@ -18,7 +18,10 @@ const routerLinks: RouterLink[] = characterRoute.children!
 <template>
     <h1>Personajes</h1>
     <Navbar :show-icon="false" :links="routerLinks" />
+    <!-- https://vuejs.org/guide/built-ins/suspense.html -->
+    <!-- <Suspense> -->
     <RouterView />
+    <!-- </Suspense> -->
 </template>
 
 <style scoped></style>

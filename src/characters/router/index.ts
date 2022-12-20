@@ -15,7 +15,7 @@ export const characterRoute: RouteRecordRaw = {
         {
             path: "list",
             name: "CharacterList",
-            props: { title: 'Lista', visible: true },
+            props: { title: 'Lista de Personajes', visible: true },
             component: () => import("@/characters/pages/CharacterList.vue"),
         },
         {
