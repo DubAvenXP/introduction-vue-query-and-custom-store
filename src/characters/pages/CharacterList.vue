@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import CardList from "@/characters/components/CardList.vue";
-import useCharacters from "../composables/useCharacters";
+import { useCharacters } from "@/characters/composables";
 
 const props = defineProps<{ title: string; visible: boolean }>();
-const { isLoading, hasError, errorMessage, characters, count } = useCharacters();
+const { isLoading, hasError, errorMessage, characters, count } =
+    useCharacters();
 </script>
 
 <template>

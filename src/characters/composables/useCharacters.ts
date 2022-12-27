@@ -7,7 +7,6 @@ import { isAxiosError } from 'axios';
 
 // defined in the global state
 const characters = ref<Character[]>([]);
-const isLoading = ref<boolean>(true);
 const hasError = ref<boolean>(false);
 const errorMessage = ref<string | null>(null);
 
@@ -21,7 +20,6 @@ const loadCharacters = (data: Character[]) => {
     hasError.value = false;
     errorMessage.value = null;
     characters.value = data;
-    isLoading.value = false;
 };
 
 const loadError = (error: unknown) => {
@@ -29,11 +27,10 @@ const loadError = (error: unknown) => {
     if (isAxiosError(error)) {
         errorMessage.value = error.response?.data.error;
     }
-    isLoading.value = false;
 }
 
-const useCharacters = () => {
-    const {} = useQuery(["characters"], getCharacters, {
+export const useCharacters = () => {
+    const { isLoading } = useQuery(["characters"], getCharacters, {
         onSuccess: loadCharacters,
         onError: loadError,
     });
@@ -51,5 +48,3 @@ const useCharacters = () => {
         // methods
     };
 };
-
-export default useCharacters;

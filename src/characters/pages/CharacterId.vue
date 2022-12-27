@@ -1,50 +1,38 @@
 <script setup lang="ts">
-import { useRoute } from "vue-router";
-import characterStore from "@/store/characters.store";
+import { watch, watchEffect } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useCharacter } from "@/characters/composables";
 
-import rickAndMortyApi from "@/api/rickAndMortyApi";
-import type { Character } from "@/interfaces/character";
-import { useQuery } from "@tanstack/vue-query";
 
 const route = useRoute();
+const router = useRouter();
 
 // in this case the reactivity will be lost
 const { id } = route.params as { id: string };
 
-const getCharacterCacheFirst = async (
-    characterId: string
-): Promise<Character> => {
-    if (characterStore.checkId(characterId)) {
-        return characterStore.ids.list[characterId];
-    }
+const { character, isLoading, hasError, errorMessage } = useCharacter(id);
 
-    const { data } = await rickAndMortyApi.get<Character>(
-        `/character/${characterId}`
-    );
-    return data;
-};
-
-const { data: character } = useQuery<Character>(
-    ["character", id],
-    () => getCharacterCacheFirst(id),
-    {
-        onSuccess: (data) => {
-            characterStore.loadId(data);
-        },
+watchEffect(() => {
+    if (!isLoading.value && hasError.value) {
+        router.replace("/characters");
     }
-);
+});
 </script>
 
 <template>
     <div>
         <h1>Character #{{ id }}</h1>
-        <h1 v-if="!character">Loading...</h1>
-        <h1 v-else-if="characterStore.characters.hasError">
-            {{ characterStore.characters.errorMessage }}
+        <h1 v-if="isLoading">Loading...</h1>
+        <h1 v-else-if="hasError">
+            {{ errorMessage }}
         </h1>
-        <div v-else class="card">
+        <div v-else-if="character" class="card">
             <figure>
-                <img :src="character.image" :alt="character.name" class="card-image" />
+                <img
+                    :src="character.image"
+                    :alt="character.name"
+                    class="card-image"
+                />
             </figure>
             <div class="card-content">
                 <h2>{{ character.name }}</h2>
@@ -83,7 +71,6 @@ figure {
     object-fit: contain;
 }
 
-
 .card-content {
     width: 100%;
     display: flex;
@@ -101,5 +88,9 @@ figure {
     width: 100%;
     display: flex;
     justify-content: center;
+}
+
+h1 {
+    margin: 2rem 0;
 }
 </style>
