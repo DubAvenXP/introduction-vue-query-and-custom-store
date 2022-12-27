@@ -1,8 +1,10 @@
 import type { RouteRecordRaw } from "vue-router";
 
+const ROUTE_NAME = "characters";
+
 export const characterRoute: RouteRecordRaw = {
-    path: "/characters",
-    redirect: "/characters/list",
+    path: `/${ROUTE_NAME}`,
+    redirect: `/${ROUTE_NAME}/list`,
     name: "Characters",
     component: () => import("@/characters/layout/CharacterLayout.vue"),
     children: [
