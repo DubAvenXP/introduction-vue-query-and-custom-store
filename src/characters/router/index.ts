@@ -7,7 +7,7 @@ export const characterRoute: RouteRecordRaw = {
     component: () => import("@/characters/layout/CharacterLayout.vue"),
     children: [
         {
-            path: "by/id",
+            path: ":id",
             name: "CharacterId",
             props: { title: 'Por Id', visible: false },
             component: () => import("@/characters/pages/CharacterId.vue"),
