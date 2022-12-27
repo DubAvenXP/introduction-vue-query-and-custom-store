@@ -1,53 +1,55 @@
-import { ref, onMounted } from "vue";
-import axios from "axios";
+import { computed, ref } from "vue";
+import { useQuery } from "@tanstack/vue-query";
 
-import rickAndMortyApi from "@/api/rickAndMortyApi";
 import type { Character, ResponseCharacter } from "@/interfaces/character";
+import rickAndMortyApi from '@/api/rickAndMortyApi';
+import { isAxiosError } from 'axios';
 
-// Global state
+// defined in the global state
 const characters = ref<Character[]>([]);
 const isLoading = ref<boolean>(true);
 const hasError = ref<boolean>(false);
-const errorMessage = ref<string | undefined>();
+const errorMessage = ref<string | null>(null);
 
-export const useCharacters = () => {
-    // With suspense
-    // const { data } = await rickAndMortyApi.get<ResponseCharacter>('/character');
-    // const characters = ref<Character[]>(data.results);
+const getCharacters = async (): Promise<Character[]> => {
+    if (characters.value.length) return characters.value;
+    const { data } = await rickAndMortyApi.get<ResponseCharacter>("/character");
+    return data.results;
+};
 
-    // Local state
-    // const characters = ref<Character[]>([]);
-    // const isLoading = ref<boolean>(true);
+const loadCharacters = (data: Character[]) => {
+    hasError.value = false;
+    errorMessage.value = null;
+    characters.value = data;
+    isLoading.value = false;
+};
 
-    onMounted(async () => {
-        await loadCharacters();
+const loadError = (error: unknown) => {
+    hasError.value = true;
+    if (isAxiosError(error)) {
+        errorMessage.value = error.response?.data.error;
+    }
+    isLoading.value = false;
+}
+
+const useCharacters = () => {
+    const {} = useQuery(["characters"], getCharacters, {
+        onSuccess: loadCharacters,
+        onError: loadError,
     });
 
-    const loadCharacters = async () => {
-        if (characters.value.length) return;
-
-        try {
-            isLoading.value = true;
-            const { data } = await rickAndMortyApi.get<ResponseCharacter>(
-                "/character"
-            );
-            characters.value = data.results;
-        } catch (error) {
-            hasError.value = true;
-            if (axios.isAxiosError(error)) {
-                return (errorMessage.value = error.message);
-            }
-
-            errorMessage.value = JSON.stringify(error);
-        } finally {
-            isLoading.value = false;
-        }
-    };
-
     return {
+        // properties
         characters,
         isLoading,
         hasError,
         errorMessage,
+
+        // getters
+        count: computed(() => characters.value.length),
+
+        // methods
     };
 };
+
+export default useCharacters;
